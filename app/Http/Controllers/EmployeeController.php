@@ -64,7 +64,8 @@ class EmployeeController extends Controller
     public function show(Employee $employee)
     {
 
-        $detail = Data::where('employees_id', $employee->id)->orderBy('created_at', 'ASC')->get();
+        $detail = Data::where('employees_id', $employee->id)->distinct()->orderBy('created_at', 'ASC')->get();
+        // $detail = Data::select('date')->where('employees_id', $employee->id)->distinct('date')->orderBy('created_at', 'ASC')->get();
         
         
         $globalSearch = AllowedFilter::callback('global', function ($query, $value) {
@@ -76,15 +77,14 @@ class EmployeeController extends Controller
                 });
             });
         });
-        
+
+        $detail_employee = QueryBuilder::for(Data::select('employees_id','date','uid','sn')->distinct('date')->where('employees_id', $employee->id));
+
         return view('employee.show', compact('employee','detail'), [
-            'em' => SpladeTable::for(Data::query()->where('employees_id', $employee->id))
-                ->defaultSort('id')
-                ->column(key: 'id', sortable: true)
-                ->column(key: 'uid', searchable: true, sortable: true)
-                ->column(key: 'lat', searchable: true, sortable: true)
-                ->column(key: 'long', searchable: true, sortable: true)
+            'em' => SpladeTable::for($detail_employee)
+                ->defaultSort('date')
                 ->column(key: 'date', searchable: true, sortable: true)
+                ->column(key: 'uid', searchable: true, sortable: true)
                 ->column(key: 'sn', searchable: true, sortable: true)
                 ->column(label: 'Actions')
                 ->paginate(10),
@@ -125,5 +125,11 @@ class EmployeeController extends Controller
         $employee->delete();
         return redirect()->route('employee.index')->with('message', 'Post deleted.');
 
+    }
+
+    public function detail($id, $tgl){
+        $detail = Data::where('employees_id', $id)->where('date', $tgl)->orderBy('created_at', 'ASC')->get();
+
+        return view('employee.detail', compact('detail'));
     }
 }

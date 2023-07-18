@@ -51,9 +51,12 @@ Route::middleware(['splade'])->group(function () {
     ])->group(function () {
         Route::view('/dashboard', 'dashboard')->name('dashboard');
         Route::resource('/employee', EmployeeController::class);
+        Route::get('/employee/{id}/{tgl}', [EmployeeController::class, 'detail'])->name('employee.detail');
+
 
         Route::get('/employee/{slug}/{sn}/{uid}/{lat}/{long}/{date}', [DataController::class, 'tambah']);
         // http://127.0.0.1:8000/employee/2/snkk/uidd/1233/333/2023-06-22  
+        
         
 
         Route::resource('/data', DataController::class);
