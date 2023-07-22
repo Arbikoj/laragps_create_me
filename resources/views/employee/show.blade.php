@@ -4,7 +4,6 @@
     <x-slot:header>
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Employee') }}
-            {{-- {{ $employee->nama }} --}}
         </h2>
     </x-slot>
 
@@ -28,26 +27,65 @@
                 </div>
 
 
-                <div id="map"></div>
-                <br>
-                {{-- {{ $employee->id }}
+                {{-- <div id="map"></div> --}}
+                {{-- 
+                {{ $employee->id }}
                 {{ $employee->id }}  
                 {{ $employee->uid }}  
                 {{ $employee->nama }}  
                 {{ $employee->gender }}  
---}}
-                {{-- @foreach ($detail as $item)
-                <br> date : {{ $item->date }}
-                @endforeach  --}}
-                {{-- {{ $employee->id }} --}}
-                <x-splade-table :for="$em">
-                    <x-splade-cell actions>
-                        {{-- <Link modal href="{{ route('employee.edit', $item->id) }}" class="px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4"> Edit </Link>
-                        <Link href="{{ route('employee.destroy', $item->id) }}" method="DELETE" class="px-4 py-1 bg-red-100 border border-red-400 rounded-md text-red-600 hover:bg-red-200 mr-4"> Delete </Link> --}}
-                        <Link href="{{ route('employee.detail', ['id' => $item->employees_id, 'tgl' => $item->date]) }}" class="px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4"> Show </Link>
+                --}}
 
-                    </x-splade-cell>
-                </x-splade-table> 
+                {{-- @foreach ($select_thn as $item)
+                    {{ $item->thn }}
+                @endforeach --}}
+
+                <?php 
+                
+                function numberToMonth($monthNumber) {
+                    $monthNames = [
+                        1 => 'Januari',
+                        2 => 'Februari',
+                        3 => 'Maret',
+                        4 => 'April',
+                        5 => 'Mei',
+                        6 => 'Juni',
+                        7 => 'Juli',
+                        8 => 'Agustus',
+                        9 => 'September',
+                        10 => 'Oktober',
+                        11 => 'November',
+                        12 => 'Desember',
+                    ];
+
+                    if (isset($monthNames[$monthNumber])) {
+                        return $monthNames[$monthNumber];
+                    } else {
+                        return 'Invalid Month';
+                    }                
+                }
+                ?>
+                <div class="p-2">
+                    {{-- <select>
+                        @foreach ($select_thn as $item)
+                        <option value="{{ $item->thn }}">{{ $item->thn }}</option>
+                        @endforeach
+                    </select>
+
+                    <select>
+                        @foreach ($select_bln as $item)
+                        <option value="{{ $item->bln }}"><?=numberToMonth($item->bln) ?></option>
+                        @endforeach
+                    </select> --}}
+                    <x-splade-table :for="$em">
+                        <x-splade-cell actions>
+                            {{-- <Link modal href="{{ route('employee.edit', $item->id) }}" class="px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4"> Edit </Link>
+                            <Link href="{{ route('employee.destroy', $item->id) }}" method="DELETE" class="px-4 py-1 bg-red-100 border border-red-400 rounded-md text-red-600 hover:bg-red-200 mr-4"> Delete </Link> --}}
+                            <Link href="{{ route('employee.detail', ['id' => $item->employees_id, 'tgl' => $item->date]) }}" class="px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4"> Show </Link>
+
+                        </x-splade-cell>
+                    </x-splade-table> 
+                </div>
             </div>
         </div>
     </div>
@@ -102,7 +140,7 @@
             mapku.fitBounds(polyline.getBounds());
         }
 
-        initMap(x);
+        {{-- initMap(x); --}}
 
         
     </x-splade-script>

@@ -63,30 +63,53 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
-
-        $detail = Data::where('employees_id', $employee->id)->distinct()->orderBy('created_at', 'ASC')->get();
-        // $detail = Data::select('date')->where('employees_id', $employee->id)->distinct('date')->orderBy('created_at', 'ASC')->get();
-        
+        $detail = Data::where('employees_id', $employee->id)->distinct()->orderBy('created_at', 'ASC')->get();       
+        $select_bln = Data::select(DATA::raw('MONTH(date) AS bln'))->where('employees_id', $employee->id)->distinct('bln')->orderBy('bln', 'ASC')->get();
+        $select_thn = Data::select(DATA::raw('YEAR(date) AS thn'))->where('employees_id', $employee->id)->distinct('thn')->orderBy('thn', 'ASC')->get();
         
         $globalSearch = AllowedFilter::callback('global', function ($query, $value) {
             $query->where(function ($query) use ($value) {
                 Collection::wrap($value)->each(function ($value) use ($query) {
                     $query
-                        ->orWhere('name', 'LIKE', "%{$value}%")
-                        ->orWhere('email', 'LIKE', "%{$value}%");
+                        ->orWhere('uid', 'LIKE', "%{$value}%")
+                        ->orWhere('bln', 'LIKE', "%{$value}%")
+                        ->orWhere('sn', 'LIKE', "%{$value}%")
+                        ->orWhere('thn', 'LIKE', "%{$value}%");
                 });
             });
         });
 
-        $detail_employee = QueryBuilder::for(Data::select('employees_id','date','uid','sn')->distinct('date')->where('employees_id', $employee->id));
+        $detail_employee = QueryBuilder::for(Data::select('employees_id','date','uid','sn', DATA::raw('MONTH(date) AS bln'), DATA::raw('YEAR(date) AS thn'))->distinct('date')->where('employees_id', $employee->id)->orderBy('date', 'ASC'))
+                                ->allowedFilters(['uid', 'sn', 'date', 'bln', 'thn', $globalSearch]);
 
-        return view('employee.show', compact('employee','detail'), [
+        return view('employee.show', compact('employee','detail', 'select_bln', 'select_thn'), [
             'em' => SpladeTable::for($detail_employee)
                 ->defaultSort('date')
                 ->column(key: 'date', searchable: true, sortable: true)
                 ->column(key: 'uid', searchable: true, sortable: true)
+                ->column(key: 'bln', searchable: true, sortable: true)
+                ->column(key: 'thn', searchable: true, sortable: true)
                 ->column(key: 'sn', searchable: true, sortable: true)
                 ->column(label: 'Actions')
+                // ->selectFilter(key: 'thn', label: 'Tahun', options: [
+                //     date('M', strtotime('date')) => '2022',
+                //     '-01-' => 'bulan',
+                // ])
+                ->selectFilter(key: 'date', label: 'Bulan', options: [
+                    '-01-' => 'January',
+                    '-02-' => 'February',
+                    '-03-' => 'Maret',
+                    '-04-' => 'April',
+                    '-05-' => 'Mei',
+                    '-06-' => 'Juni',
+                    '-07-' => 'Juli',
+                    '-08-' => 'Agustus',
+                    '-09-' => 'September',
+                    '-10-' => 'Oktober',
+                    '-11-' => 'November',
+                    '-12-' => 'Desember',
+
+                ])
                 ->paginate(10),
             ]);
     }
@@ -132,4 +155,5 @@ class EmployeeController extends Controller
 
         return view('employee.detail', compact('detail'));
     }
+
 }

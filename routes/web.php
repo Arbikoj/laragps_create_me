@@ -55,7 +55,7 @@ Route::middleware(['splade'])->group(function () {
 
 
         Route::get('/employee/{slug}/{sn}/{uid}/{lat}/{long}/{date}', [DataController::class, 'tambah']);
-        // http://127.0.0.1:8000/employee/2/snkk/uidd/1233/333/2023-06-22  
+        // http://127.0.0.1:8000/employee/1/snkk/uidd/-7.271785218038426/112.79703277179932/2023-07-01
         
         
 

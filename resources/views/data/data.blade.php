@@ -13,23 +13,37 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-5">
 
-                <x-splade-button id="connect-button" :label="__('Connect')" />
-                {{-- <x-splade-button id="disconnect-button" :label="__('Close')" class="ml-4" /> --}}
-                <x-splade-button id="send-data " class="hidden">Tambah Data</x-splade-button>
-                ini adalah data
-            
-                <div>
+                <div class="my-3 flex xl:w-1/2 w-full justify-between block">
+                    <div class="mr-2">
+                        <button id="connect-button" class="px-5 py-2 text-white bg-blue-800 rounded-lg focus:outline-none">Connect</button>
+                        <x-splade-button id="send-data " class="hidden">Tambah Data</x-splade-button>
+                    </div>
+                    <div class="w-full mx-2">
+                        <select name="country_code" class="rounded w-full">
+                            <option selected value="1">CreateMe GPS</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mx-2">
+                        <button id="disconnect-button" class="px-5 py-2 text-white bg-blue-800 rounded-lg focus:outline-none opacity-50 cursor-not-allowed">Disconnect<button/>
+                    </div>
+                </div>
+
+                <div class="my-5">
                 
                     <Link modal href="{{ route('data.create') }}" class="px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4"> Add </Link>
+                    <Button id="send-data " class="hidden px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4"> Read File </Button>
+
 
                 </div>
-                <x-splade-table :for="$dataku">
+                {{-- TABEL --}}
+                {{-- <x-splade-table :for="$dataku">
 
                     <x-splade-cell actions>
                         <Link modal href="{{ route('data.edit', $item->id) }}" class="px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4"> Edit </Link>
                         <Link href="{{ route('data.destroy', $item->id) }}" method="DELETE" class="px-4 py-1 bg-red-100 border border-red-400 rounded-md text-red-600 hover:bg-red-200"> Delete </Link>
                     </x-splade-cell>
-                </x-splade-table>
+                </x-splade-table> --}}
             </div>
         </div>
     </div>
@@ -64,9 +78,16 @@
             {{-- await port.open({ baudRate: 9600 }); --}}
             await port.open({ baudRate: 9600 });
 
-            document.getElementById("connect-button").style.display = "none";
-            document.getElementById("send-data").style.display = "block";
+            {{-- disable button --}}
+            document.querySelector('#connect-button').disabled = true;
+            document.getElementById("connect-button").classList.add("opacity-50");
+            document.getElementById("connect-button").classList.add("cursor-not-allowed");
 
+            document.querySelector('#disconnect-button').disabled = false;
+            document.getElementById("disconnect-button").classList.remove("opacity-50");
+            document.getElementById("disconnect-button").classList.remove("cursor-not-allowed");
+            document.getElementById("send-data").style.display = "block";
+            {{-- opacity-50 cursor-not-allowed --}}
             
             const textDecoder = new TextDecoderStream();
             const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
@@ -90,19 +111,16 @@
             {{-- "2023-06-23*09:47:36*11230616001*arbi-id*-6.952174000*110.235268667"; --}}
   
             var [date, time, sn, uid, lat, long] = dataku.split('*');
-            console.log(date);
+            {{-- console.log(date);
             console.log(time);
             console.log(sn);
             console.log(uid); //angka
             console.log(lat);
-            console.log(long);
+            console.log(long); --}}
 
-            {{-- window.location = ('http://127.0.0.1:8000/employee/2/'+sn+'/'+uid+'/'+lat+'/'+long+'/'+date+''); --}}
+            {{-- window.location = ('http://127.0.0.1:8000/employee/1/'+sn+'/'+uid+'/'+lat+'/'+long+'/'+date+''); --}}
             {{-- console.log(); --}}
             }
-
-
-
         });
 
         document.querySelector('#send-data').addEventListener('click', async() => {
@@ -116,6 +134,19 @@
 
             // Allow the serial port to be closed later.
             writer.releaseLock();
+        });
+
+        document.querySelector('#disconnect-button').addEventListener('click', async() => {
+            location.reload();
+            await port.close();
+            console.log("disconnect");
+            document.querySelector('#connect-button').disabled = false;
+            document.getElementById("connect-button").classList.remove("opacity-50");
+            document.getElementById("connect-button").classList.remove("cursor-not-allowed");
+
+            document.querySelector('#disconnect-button').disabled = true;
+            document.getElementById("disconnect-button").classList.add("opacity-50");
+            document.getElementById("disconnect-button").classList.add("cursor-not-allowed");
         });
 
         
