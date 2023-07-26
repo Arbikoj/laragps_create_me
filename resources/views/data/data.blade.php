@@ -16,7 +16,9 @@
                 <div class="my-3 flex xl:w-1/2 w-full justify-between block">
                     <div class="mr-2">
                         <button id="connect-button" class="px-5 py-2 text-white bg-blue-800 rounded-lg focus:outline-none">Connect</button>
-                        <x-splade-button id="send-data " class="hidden">Tambah Data</x-splade-button>
+                        <x-splade-button id="send-data " class="my-2 hidden">Read File</x-splade-button>
+                    <button id="read-file" class="py-2 hidden px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4">upload</button>
+
                     </div>
                     <div class="w-full mx-2">
                         <select name="country_code" class="rounded w-full">
@@ -25,17 +27,30 @@
                     </div>
                     
                     <div class="mx-2">
-                        <button id="disconnect-button" class="px-5 py-2 text-white bg-blue-800 rounded-lg focus:outline-none opacity-50 cursor-not-allowed">Disconnect<button/>
+                        <button id="disconnect-button" class="px-5 py-2 text-white bg-blue-800 rounded-lg focus:outline-none opacity-50 cursor-not-allowed">Disconnect</button>
                     </div>
                 </div>
 
                 <div class="my-5">
                 
                     <Link modal href="{{ route('data.create') }}" class="px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4"> Add </Link>
-                    <Button id="send-data " class="hidden px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4"> Read File </Button>
-
-
                 </div>
+
+                <div>
+                    <table class="min-w-full text-left text-sm font-light">
+                        <thead
+                        class="border-b bg-white font-medium dark:border-neutral-500 dark:bg-neutral-600">
+                        <tr>
+                            <th scope="col" class="px-6 py-2">#</th>
+                            <th scope="col" class="px-6 py-2">aksi</th>
+                        </tr>
+                        </thead>
+                        <tbody id="data-file">
+                        
+                        </tbody>
+                    </table>
+                </div>
+
                 {{-- TABEL --}}
                 {{-- <x-splade-table :for="$dataku">
 
@@ -47,7 +62,15 @@
             </div>
         </div>
     </div>
+
     <x-splade-script>
+        var gogo = "";  
+        var fileku = '';
+        fileku = `
+        <p> hehe 354 </p>
+        `;
+        
+
         class LineBreakTransformer {
             constructor() {
                 // A container for holding stream data until a new line.
@@ -68,9 +91,13 @@
                 controller.enqueue(this.chunks);
             }
         }
+
+
         
         document.querySelector('#connect-button').addEventListener('click', async() => {
             console.log("connect");
+            
+            var sumdata = "";
             // Request serial port access
             port = await navigator.serial.requestPort();
     
@@ -87,6 +114,7 @@
             document.getElementById("disconnect-button").classList.remove("opacity-50");
             document.getElementById("disconnect-button").classList.remove("cursor-not-allowed");
             document.getElementById("send-data").style.display = "block";
+            document.getElementById("read-file").style.display = "block";
             {{-- opacity-50 cursor-not-allowed --}}
             
             const textDecoder = new TextDecoderStream();
@@ -94,6 +122,7 @@
             const reader = textDecoder.readable.pipeThrough(new TransformStream(new LineBreakTransformer())).getReader();
 
             // Listen to data coming from the serial device.
+            
             while (true) {
             const { value, done } = await reader.read();
             if (done) {
@@ -102,11 +131,32 @@
                 break;
             }
             // value is a string.
+            
             var dataku = "";
             dataku = dataku + value;
-
+            
+            {{-- for(let a=0; a<=4; a++){
+                gogo[a] = dataku;
+            } --}}
+            {{-- console.log(gogo[0]); --}}
+            
+            
             console.log(dataku);
+            
+            var myArray = dataku.split("*");
+            console.log(myArray);
+            let lengthList = myArray.length;
 
+            for(let a=0; a < lengthList; a++){
+                document.getElementById("data-file").innerHTML += `
+                <tr class="border-b bg-neutral-100 dark:border-neutral-500 dark:bg-neutral-700">
+                    <td class="whitespace-nowrap px-6 py-2 font-medium">${myArray[a]}</td>
+                    <td class="whitespace-nowrap px-6 py-2 font-medium">
+                        <button onclick="uploadData()" class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded-lg">upload</button>
+                    </td>
+                </tr>
+                `
+            }
             {{-- {slug}/{sn}/{uid}/{lat}/{long}/{date} --}}
             {{-- "2023-06-23*09:47:36*11230616001*arbi-id*-6.952174000*110.235268667"; --}}
   
@@ -120,16 +170,32 @@
 
             {{-- window.location = ('http://127.0.0.1:8000/employee/1/'+sn+'/'+uid+'/'+lat+'/'+long+'/'+date+''); --}}
             {{-- console.log(); --}}
+
             }
+
+            console.log(sumdata);
         });
 
         document.querySelector('#send-data').addEventListener('click', async() => {
-            
-            console.log("send data")
+            document.getElementById("data-file").innerHTML = "";
+            console.log("send read data")
 
             const writer = port.writable.getWriter();
 
             const data = new Uint8Array([49]); // 1 ascii
+            await writer.write(data);
+
+            // Allow the serial port to be closed later.
+            writer.releaseLock();
+        });
+
+        document.querySelector('#read-file').addEventListener('click', async() => {
+            
+            console.log("baca data 1")
+
+            const writer = port.writable.getWriter();
+
+            const data = new Uint8Array([50]); // 1 ascii
             await writer.write(data);
 
             // Allow the serial port to be closed later.
@@ -148,6 +214,10 @@
             document.getElementById("disconnect-button").classList.add("opacity-50");
             document.getElementById("disconnect-button").classList.add("cursor-not-allowed");
         });
+
+        function uploadData(){
+            console.log("txt");
+        }
 
         
     </x-splade-script>
