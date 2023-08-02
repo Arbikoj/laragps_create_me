@@ -16,8 +16,7 @@
                 <div class="my-3 flex xl:w-1/2 w-full justify-between block">
                     <div class="mr-2">
                         <button id="connect-button" class="px-5 py-2 text-white bg-blue-800 rounded-lg focus:outline-none">Connect</button>
-                        <x-splade-button id="send-data " class="my-2 hidden">Read File</x-splade-button>
-                    <button id="read-file" class="py-2 hidden px-4 py-1 bg-indigo-100 border border-indigo-400 rounded-md text-indigo-600 hover:bg-indigo-200 mr-4">upload</button>
+                        <x-splade-button id="readfile-button" class="my-2 hidden">Read File</x-splade-button>
 
                     </div>
                     <div class="w-full mx-2">
@@ -113,8 +112,7 @@
             document.querySelector('#disconnect-button').disabled = false;
             document.getElementById("disconnect-button").classList.remove("opacity-50");
             document.getElementById("disconnect-button").classList.remove("cursor-not-allowed");
-            document.getElementById("send-data").style.display = "block";
-            document.getElementById("read-file").style.display = "block";
+            document.getElementById("readfile-button").style.display = "block";
             {{-- opacity-50 cursor-not-allowed --}}
             
             const textDecoder = new TextDecoderStream();
@@ -133,6 +131,7 @@
             // value is a string.
             
             var dataku = "";
+            var tempsub = "";
             dataku = dataku + value;
             
             {{-- for(let a=0; a<=4; a++){
@@ -142,21 +141,31 @@
             
             
             console.log(dataku);
-            
+            tempsub = dataku;
+            dataku = dataku.substring(2);
             var myArray = dataku.split("*");
             console.log(myArray);
             let lengthList = myArray.length;
 
-            for(let a=0; a < lengthList; a++){
-                document.getElementById("data-file").innerHTML += `
-                <tr class="border-b bg-neutral-100 dark:border-neutral-500 dark:bg-neutral-700">
-                    <td class="whitespace-nowrap px-6 py-2 font-medium">${myArray[a]}</td>
-                    <td class="whitespace-nowrap px-6 py-2 font-medium">
-                        <button onclick="uploadData()" class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded-lg">upload</button>
-                    </td>
-                </tr>
-                `
+            if(tempsub.slice(0, 2) == "##"){
+                for(let a=0; a < lengthList; a++){
+                    document.getElementById("data-file").innerHTML += `
+                    <tr class="border-b bg-neutral-100 dark:border-neutral-500 dark:bg-neutral-700">
+                        <td class="whitespace-nowrap px-6 py-2 font-medium">${myArray[a]}</td>
+                        <td class="whitespace-nowrap px-6 py-2 font-medium">
+                            <button onclick="
+                                const writer = port.writable.getWriter();
+                                const data = new Uint8Array([57]); //asci 9
+                                writer.write(data);
+                                // Allow the serial port to be closed later.
+                                writer.releaseLock();   
+                            " class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded-lg">upload</button>
+                        </td>
+                    </tr>
+                    `
+                }
             }
+            
             {{-- {slug}/{sn}/{uid}/{lat}/{long}/{date} --}}
             {{-- "2023-06-23*09:47:36*11230616001*arbi-id*-6.952174000*110.235268667"; --}}
   
@@ -176,7 +185,7 @@
             console.log(sumdata);
         });
 
-        document.querySelector('#send-data').addEventListener('click', async() => {
+        document.querySelector('#readfile-button').addEventListener('click', async() => {
             document.getElementById("data-file").innerHTML = "";
             console.log("send read data")
 
@@ -185,18 +194,6 @@
             const data = new Uint8Array([49]); // 1 ascii
             await writer.write(data);
 
-            // Allow the serial port to be closed later.
-            writer.releaseLock();
-        });
-
-        document.querySelector('#read-file').addEventListener('click', async() => {
-            
-            console.log("baca data 1")
-
-            const writer = port.writable.getWriter();
-
-            const data = new Uint8Array([50]); // 1 ascii
-            await writer.write(data);
 
             // Allow the serial port to be closed later.
             writer.releaseLock();
@@ -214,12 +211,6 @@
             document.getElementById("disconnect-button").classList.add("opacity-50");
             document.getElementById("disconnect-button").classList.add("cursor-not-allowed");
         });
-
-        function uploadData(){
-            console.log("txt");
-        }
-
-        
     </x-splade-script>
         
 

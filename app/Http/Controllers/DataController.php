@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Data;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 
 use ProtoneMedia\Splade\SpladeTable;
@@ -106,19 +107,21 @@ class DataController extends Controller
         return redirect()->route('data.index')->with('message', 'Post deleted.');
     }
     // /employee/{slug}/{sn}/{uid}/{lat}/{long}/{date}
-    public function tambah($slug,$sn,$uid,$lat,$long,$date)
+    public function tambah($uid,$sn,$lat,$long,$date)
     {
-        
+        $n = Employee::where('uid',$uid)->first();
+        // $foreignId = $n->id;
         Data::create([
-            'employees_id' => $slug,
+            'employees_id' => $n->id,
             'uid'     => $uid,
             'sn'     => $sn,
             'lat'     => $lat,
             'long'   => $long,
             'date'   => $date,
         ]);
-        
-        return redirect()->back();
+        echo $n->id;
+        echo "oke";
+        // return redirect()->back();
 
     }
 }

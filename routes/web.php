@@ -54,8 +54,8 @@ Route::middleware(['splade'])->group(function () {
         Route::get('/employee/{id}/{tgl}', [EmployeeController::class, 'detail'])->name('employee.detail');
 
 
-        Route::get('/employee/{slug}/{sn}/{uid}/{lat}/{long}/{date}', [DataController::class, 'tambah']);
-        // http://127.0.0.1:8000/employee/1/snkk/uidd/-7.271785218038426/112.79703277179932/2023-07-01
+        Route::get('/employee/{uid}/{sn}/{lat}/{long}/{date}', [DataController::class, 'tambah']);
+        // http://127.0.0.1:8000/employee/12345/sn11/-7.271785218038426/112.79703277179932/2023-07-01
         
         
 
