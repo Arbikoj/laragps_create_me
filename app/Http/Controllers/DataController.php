@@ -119,9 +119,7 @@ class DataController extends Controller
             'long'   => $long,
             'date'   => $date,
         ]);
-        echo $n->id;
-        echo "oke";
-        // return redirect()->back();
+        return redirect()->back();
 
     }
 }

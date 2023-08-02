@@ -142,12 +142,13 @@
             
             console.log(dataku);
             tempsub = dataku;
-            dataku = dataku.substring(2);
-            var myArray = dataku.split("*");
-            console.log(myArray);
-            let lengthList = myArray.length;
-
             if(tempsub.slice(0, 2) == "##"){
+                dataku = dataku.substring(2);
+                var myArray = dataku.split("*");
+                
+                console.log(myArray);
+
+                let lengthList = myArray.length;
                 for(let a=0; a < lengthList; a++){
                     document.getElementById("data-file").innerHTML += `
                     <tr class="border-b bg-neutral-100 dark:border-neutral-500 dark:bg-neutral-700">
@@ -164,21 +165,21 @@
                     </tr>
                     `
                 }
+            }else{
+                var [date, time, sn, uid, lat, long] = dataku.split('*');
+                console.log(date);
+                console.log(time);
+                console.log(sn);
+                console.log(uid); //angka
+                console.log(lat);
+                console.log(long);
+    
+                window.location = ('http://127.0.0.1:8000/employee/'+uid+'/'+sn+'/'+lat+'/'+long+'/'+date+'');
+                
             }
             
             {{-- {slug}/{sn}/{uid}/{lat}/{long}/{date} --}}
             {{-- "2023-06-23*09:47:36*11230616001*arbi-id*-6.952174000*110.235268667"; --}}
-  
-            var [date, time, sn, uid, lat, long] = dataku.split('*');
-            {{-- console.log(date);
-            console.log(time);
-            console.log(sn);
-            console.log(uid); //angka
-            console.log(lat);
-            console.log(long); --}}
-
-            {{-- window.location = ('http://127.0.0.1:8000/employee/1/'+sn+'/'+uid+'/'+lat+'/'+long+'/'+date+''); --}}
-            {{-- console.log(); --}}
 
             }
 
